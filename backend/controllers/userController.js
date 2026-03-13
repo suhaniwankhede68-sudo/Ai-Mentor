@@ -209,7 +209,6 @@ const purchaseCourse = async (req, res) => {
 };
 
 // @desc Update progress
-// @desc Update progress
 const updateCourseProgress = async (req, res) => {
   try {
     if (!req.user) return res.status(401).json({ message: "Not authorized" });
