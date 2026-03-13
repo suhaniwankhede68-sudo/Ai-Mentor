@@ -621,7 +621,7 @@ export default function Settings() {
               </div>
             )}
 
-            {activeSetting === "Appearance" && (
+            {activeSetting === "appearance" && (
               <div className="max-w-[896px]">
                 <div className="mb-8">
                   <h1 className="text-[30px] font-bold text-main font-[Inter] mb-2">
@@ -661,7 +661,7 @@ export default function Settings() {
                       </div>
                     </div>
 
-                    <div>
+                    {/* <div>
                       <h3 className="text-[16px] font-semibold text-main font-[Inter] mb-3">
                         {t("settings.appearance.language")}
                       </h3>
@@ -689,10 +689,10 @@ export default function Settings() {
                         <option value="ja">Japanese</option>
                         <option value="de">German</option>
                       </select>
-                    </div>
+                    </div> */}
                   </div>
 
-                  <div className="flex justify-end gap-4 pt-6 border-t border-border mt-6">
+                  {/* <div className="flex justify-end gap-4 pt-6 border-t border-border mt-6">
                     <button
                       type="button"
                       className="h-[50px] px-6 rounded-xl border border-border bg-card text-main text-[16px] font-medium font-[Inter] hover:bg-canvas-alt"
@@ -723,7 +723,7 @@ export default function Settings() {
                     >
                       {loading ? t("common.saving") : t("common.save_changes")}
                     </button>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             )}
