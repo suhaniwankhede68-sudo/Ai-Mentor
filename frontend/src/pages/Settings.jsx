@@ -583,34 +583,50 @@ export default function Settings() {
                     </button>
                     <button
                       onClick={async () => {
-                        if (
-                          passwordData.newPassword !==
-                          passwordData.confirmPassword
-                        ) {
-                          toast.error("New passwords do not match!");
-                          return;
-                        }
-                        setLoading(true);
-                        try {
-                          const token = localStorage.getItem("token");
-                          await axios.put(
-                            "/api/users/settings",
-                            { security: settingsData.security },
-                            { headers: { Authorization: `Bearer ${token}` } }
-                          );
-                          toast.success("Security settings updated successfully!");
-                          setPasswordData({
-                            currentPassword: "",
-                            newPassword: "",
-                            confirmPassword: "",
-                          });
-                        } catch (error) {
-                          console.error("Error updating settings:", error);
-                          toast.error("Failed to update settings. Please try again.");
-                        } finally {
-                          setLoading(false);
-                        }
-                      }}
+
+  if (!passwordData.currentPassword || !passwordData.newPassword) {
+    toast.error("Please fill all fields!");
+    return;
+  }
+
+  if (passwordData.newPassword !== passwordData.confirmPassword) {
+    toast.error("New passwords do not match!");
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    const token = localStorage.getItem("token");
+
+    await axios.put(
+      "/api/users/change-password",
+      {
+        currentPassword: passwordData.currentPassword,
+        newPassword: passwordData.newPassword
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+
+    toast.success("Password updated successfully!");
+
+    setPasswordData({
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: ""
+    });
+
+  } catch (error) {
+    console.error("Password update error:", error);
+    toast.error(error.response?.data?.message || "Failed to update password");
+  } finally {
+    setLoading(false);
+  }
+}}
                       disabled={loading}
                       className="h-[50px] px-6 rounded-xl bg-gradient-to-r from-primary to-primary text-white text-[16px] font-medium font-[Inter] hover:opacity-90 disabled:opacity-50"
                     >

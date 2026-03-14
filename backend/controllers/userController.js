@@ -99,34 +99,23 @@ const changePassword = async (req, res) => {
       return res.status(401).json({ message: "Not authorized" });
     }
 
-    if (!currentPassword || !newPassword) {
-      return res.status(400).json({ message: "All fields required" });
-    }
-
     const user = await User.findByPk(req.user.id);
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Users authenticated via OAuth may not have a local password set
-    if (!user.password) {
-      return res.status(400).json({
-        message:
-          "No local password is set for this account. Please set a password via the password reset flow.",
-      });
-    }
-    // Check current password
+    // verify current password
     const isMatch = await user.matchPassword(currentPassword);
 
     if (!isMatch) {
       return res.status(400).json({ message: "Current password incorrect" });
     }
 
-    // Update password
+    // update password
     user.password = newPassword;
 
-    await user.save(); // hook will hash it automatically
+    await user.save(); // bcrypt hashing happens in beforeSave hook
 
     res.json({ message: "Password updated successfully" });
 
