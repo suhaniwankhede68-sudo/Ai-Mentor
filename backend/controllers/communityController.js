@@ -1,7 +1,6 @@
 import CommunityPost from "../models/CommunityPost.js";
 import User from "../models/User.js";
 import crypto from "crypto";
-import { createNotification } from "./notificationController.js";
 
 // @desc    Get course community stats (list of courses with post counts)
 // @route   GET /api/community/courses
@@ -160,20 +159,20 @@ const likeCommunityPost = async (req, res) => {
     if (!post) return res.status(404).json({ message: "Post not found" });
 
     const userId = req.user.id;
-    let likes = [...(post.likes || [])];
+    let likes = post.likes || [];
     const idx = likes.findIndex((l) => l.userId === userId);
 
     if (idx > -1) {
       likes = likes.filter((l) => l.userId !== userId);
     } else {
-      likes = [...likes, { userId }];
+      likes.push({ userId });
       // Remove from dislikes if present
-      post.dislikes = (post.dislikes || []).filter((d) => d.userId !== userId);
-      post.changed("dislikes", true);
+      let dislikes = post.dislikes || [];
+      dislikes = dislikes.filter((d) => d.userId !== userId);
+      post.dislikes = dislikes;
     }
 
     post.likes = likes;
-    post.changed("likes", true);
     await post.save();
 
     const updated = await CommunityPost.findByPk(post.id, {
@@ -202,20 +201,20 @@ const dislikeCommunityPost = async (req, res) => {
     if (!post) return res.status(404).json({ message: "Post not found" });
 
     const userId = req.user.id;
-    let dislikes = [...(post.dislikes || [])];
+    let dislikes = post.dislikes || [];
     const idx = dislikes.findIndex((d) => d.userId === userId);
 
     if (idx > -1) {
       dislikes = dislikes.filter((d) => d.userId !== userId);
     } else {
-      dislikes = [...dislikes, { userId }];
+      dislikes.push({ userId });
       // Remove from likes if present
-      post.likes = (post.likes || []).filter((l) => l.userId !== userId);
-      post.changed("likes", true);
+      let likes = post.likes || [];
+      likes = likes.filter((l) => l.userId !== userId);
+      post.likes = likes;
     }
 
     post.dislikes = dislikes;
-    post.changed("dislikes", true);
     await post.save();
 
     const updated = await CommunityPost.findByPk(post.id, {
@@ -258,20 +257,9 @@ const replyCommunityPost = async (req, res) => {
       createdAt: new Date(),
     };
 
-    const updatedReplies = [...(post.replies || []), newReply];
+    const updatedReplies = [...post.replies, newReply];
     post.replies = updatedReplies;
-    post.changed("replies", true);
     await post.save();
-
-    // ✅ Notification Trigger (Discussion Reply)
-    // Send notification to the post author (unless they are replying to their own post)
-    if (post.userId !== req.user.id) {
-      createNotification(post.userId, {
-        title: "New Reply on your post",
-        message: `${req.user.name} replied: "${text.substring(0, 30)}${text.length > 30 ? '...' : ''}"`,
-        type: "social",
-      });
-    }
 
     const updated = await CommunityPost.findByPk(post.id, {
       include: [
