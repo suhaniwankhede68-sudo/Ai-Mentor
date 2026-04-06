@@ -15,17 +15,16 @@ import WatchedVideos from "./pages/WatchedVideos";
 import CoursePreview from "./pages/CoursePreview";
 import LearningPage from "./pages/LearningPage";
 import AdminPage from "./pages/AdminPage";
+import AdminDashboard from "./pages/AdminDashboard";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import "./App.css";
 
-// Redirects from the root path based on authentication status.
 const RootRedirect = () => {
   const { isAuthenticated } = useAuth();
   return <Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />;
 };
 
-// Prevents authenticated users from accessing public-only pages like login/signup.
 const PublicRoutes = () => {
   const { isAuthenticated } = useAuth();
   return isAuthenticated ? <Navigate to="/dashboard" replace /> : <Outlet />;
@@ -34,10 +33,8 @@ const PublicRoutes = () => {
 const App = () => {
   return (
     <Routes>
-      {/* Redirect from root */}
       <Route path="/" element={<RootRedirect />} />
 
-      {/* Public routes that logged-in users should not see */}
       <Route element={<PublicRoutes />}>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignUpPage />} />
@@ -45,7 +42,6 @@ const App = () => {
         <Route path="/reset-password/:token" element={<ResetPassword />} />
       </Route>
 
-      {/* Protected Routes with shared Header + Sidebar layout */}
       <Route element={<ProtectedRoute />}>
         <Route element={<DashboardLayout />}>
           <Route path="/dashboard" element={<Dashboard />} />
@@ -61,9 +57,9 @@ const App = () => {
       {/* Admin Routes */}
       <Route element={<AdminRoute />}>
         <Route path="/admin" element={<AdminPage />} />
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
       </Route>
 
-      {/* Other public routes */}
       <Route path="/course-preview/:courseId" element={<CoursePreview />} />
     </Routes>
   );

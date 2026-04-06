@@ -44,10 +44,10 @@ User.init(
       type: DataTypes.STRING,
     },
 
-    role: {
-      type: DataTypes.STRING,
-      defaultValue: "user",
-    },
+   role: {
+  type: DataTypes.ENUM("user", "admin"),
+  defaultValue: "user",
+},
 
     bio: {
       type: DataTypes.STRING,
@@ -134,4 +134,9 @@ User.prototype.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
+User.prototype.getFullName = function () {
+  return `${this.firstName || ""} ${this.lastName || ""}`.trim();
+};
+
 export default User;
+

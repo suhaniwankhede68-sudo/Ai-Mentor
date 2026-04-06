@@ -40,9 +40,11 @@ cd backend
 npm install
 cp .env.example .env
 # Fill in your database credentials and secrets in .env
-npm run dev
+cd backend
+npm install
+cp .env.example .env
 ```
-> See [`backend/README.md`](./backend/README.md) for full setup guide.
+>See [`backend/README.md`](./backend/README.md) for full setup guide. 
 
 ### 3. Setup Frontend
 ```bash
@@ -50,7 +52,9 @@ cd frontend
 npm install
 cp .env.example .env
 # Fill in your Firebase credentials in .env
-npm run dev
+cd backend
+npm install
+cp .env.example .env
 ```
 > See [`frontend/README.md`](./frontend/README.md) for full setup guide.
 
