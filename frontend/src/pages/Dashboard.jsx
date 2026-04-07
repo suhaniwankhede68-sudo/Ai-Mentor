@@ -18,9 +18,9 @@ import {
   ChevronRight,
   ChevronLeft as ChevronLeftIcon,
   CheckCircle,
-  Bookmark,
   Clock,
   Star,
+  Award,
 } from "lucide-react";
 
 const Dashboard = () => {
@@ -64,7 +64,7 @@ const Dashboard = () => {
         console.log("Fetched statsCards:", statsCards);
 
         setCoursesData({ allCourses, statsCards });
-        await fetchUserProfile(); // Ensure user data is up to date
+        await fetchUserProfile();
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
         console.log("Error details:", error);
@@ -74,9 +74,8 @@ const Dashboard = () => {
     };
 
     fetchAllData();
-  }, []); // Remove fetchUserProfile dependency to prevent re-fetching on every render
+  }, []);
 
-  // Calculate dynamic stats based on user's actual progress
   const calculateStats = () => {
     console.log("Calculating stats with user:", user);
     console.log("coursesData:", coursesData);
@@ -104,7 +103,7 @@ const Dashboard = () => {
           iconBg: "bg-green-100",
         },
         {
-          icon: <Bookmark className="w-5 h-5 text-purple-600" />,
+          icon: <Award className="w-5 h-5 text-purple-600" />,
           value: "0",
           label: "Certificates",
           change: "+0",
@@ -128,7 +127,6 @@ const Dashboard = () => {
     const totalHours = user.analytics?.totalHours || 0;
 
     user.purchasedCourses.forEach((purchasedCourse) => {
-      // Find the course in allCourses to get lesson count
       const courseInfo = coursesData.allCourses.find(
         (c) => c.id == purchasedCourse.courseId
       );
@@ -176,7 +174,6 @@ const Dashboard = () => {
 
   const dynamicStatsCards = calculateStats();
 
-  // Create dynamic myCourses from user data
   console.log("Creating myCourses with user:", user);
   console.log("coursesData.allCourses:", coursesData.allCourses);
 
@@ -226,7 +223,6 @@ const Dashboard = () => {
 
   console.log("Final myCourses:", myCourses);
 
-  // Create dynamic continueLearning from user data
   console.log("Creating continueLearning");
 
   const continueLearning = coursesData.allCourses
@@ -250,7 +246,7 @@ const Dashboard = () => {
         purchasedCourse?.progress?.completedLessons?.length || 0;
       return completedLessons > 0 && completedLessons < totalLessons;
     })
-    .slice(0, 3) // Limit to 3 courses
+    .slice(0, 3)
     .map((course) => {
       const purchasedCourse = user?.purchasedCourses?.find(
         (p) => p.courseId === course.id
@@ -269,7 +265,6 @@ const Dashboard = () => {
           ? Math.round((completedLessons / totalLessons) * 100)
           : 0;
 
-      // Get current lesson info
       const currentLesson = purchasedCourse?.progress?.currentLesson;
       const lessonTitle = currentLesson
         ? `Lesson ${currentLesson.lessonId}: ${currentLesson.moduleTitle}`
@@ -331,7 +326,6 @@ const Dashboard = () => {
   ];
 
   const handleBrowseCourses = () => {
-    // Navigate to courses page
     navigate("/courses", { state: { activeTab: "explore" } });
   };
 
@@ -376,56 +370,99 @@ const Dashboard = () => {
 
             <div className="grid grid-cols-1 gap-8">
               {/* Popular Courses */}
-              <div>
-                <h2 className="text-xl font-bold text-main mb-6">
-                  {t("dashboard.popular_courses")}
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {coursesData.allCourses.slice(0, 13).map((course, index) => (
-                    <Link to={`/learning/${course.id}`} key={index}>
-                      <div className="bg-card rounded-xl border border-border overflow-hidden shadow-sm h-full hover:shadow-lg hover:-translate-y-1 hover:border-teal-500/40 transition-all duration-300">
-                        <div className="relative">
-                          <img
-                            src={course.image}
-                            alt={course.title}
-                            className="w-full h-40 object-cover"
-                          />
-                          <div className="absolute top-3 right-3 bg-card rounded-full p-2">
-                            <Bookmark className="w-4 h-4 text-teal-600" />
-                          </div>
-                          <div className="absolute bottom-3 right-3 bg-card rounded-full px-2 py-1 flex items-center space-x-1">
-                            <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                            <span className="text-xs font-medium">
-                              {course.rating}
-                            </span>
-                          </div>
-                        </div>
-                        <div className="p-4">
-                          <div
-                            className={`inline-block px-2 py-1 rounded-full text-xs font-medium mb-3 ${course.categoryColor}`}
-                          >
-                            {course.category}
-                          </div>
-                          <h3 className="font-semibold text-main mb-2 line-clamp-2">
-                            {course.title}
-                          </h3>
-                          <p className="text-sm text-muted mb-4">
-                            {course.lessons}
-                          </p>
-                          <div className="flex items-center justify-between">
-                            <span className="text-lg font-bold text-main">
-                              {course.price}
-                            </span>
-                            <span className="text-xs text-muted">
-                              {course.students}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              </div>
+              
+<div>
+  <div className="flex items-center justify-between mb-4">
+    <h2 className="text-xl font-bold text-main">
+      {t("dashboard.popular_courses")}
+    </h2>
+
+    {/* Buttons */}
+   <div className="flex gap-2">
+  <button
+    onClick={() => {
+      document.getElementById("courseSlider").scrollBy({
+        left: -300,
+        behavior: "smooth",
+      });
+    }}
+    className="p-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700"
+  >
+    <ChevronLeft className="w-4 h-4" />
+  </button>
+
+  <button
+    onClick={() => {
+      document.getElementById("courseSlider").scrollBy({
+        left: 300,
+        behavior: "smooth",
+      });
+    }}
+    className="p-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700"
+  >
+    <ChevronRight className="w-4 h-4" />
+  </button>
+</div>
+</div>
+
+
+  {/* Slider */}
+  <div
+    id="courseSlider"
+    className="flex gap-6 overflow-x-auto pb-4 scroll-smooth"
+  >
+    {coursesData.allCourses.slice(0, 10).map((course, index) => (
+      <div
+        key={index}
+        className="bg-card rounded-xl border border-border w-64 flex-shrink-0 shadow-sm"
+      >
+        {/* Image */}
+        <div className="relative h-40">
+          <img
+            src={course.image}
+            alt={course.title}
+            className="w-full h-full object-cover rounded-t-xl"
+          />
+
+          {/* Rating */}
+          <div className="absolute bottom-2 right-2 bg-black/70 px-2 py-1 rounded-full flex items-center gap-1">
+            <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
+            <span className="text-xs text-white font-semibold">
+              {course.rating}
+            </span>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="p-4 space-y-2">
+          <h3 className="text-sm font-semibold text-main line-clamp-2">
+            {course.title}
+          </h3>
+
+          <p className="text-xs text-muted">
+            {course.lessons} • {course.level}
+          </p>
+
+          <div className="flex justify-between items-center mt-2">
+            <span className="font-bold text-green-500">₹0</span>
+
+            <button
+              onClick={() => navigate(`/course-preview/${course.id}`)}
+              className="px-3 py-1.5 text-xs bg-teal-500 text-white rounded-lg hover:bg-teal-600"
+            >
+              Enroll
+            </button>
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+</div>
+              
+
+              
+
+              
 
               {/* My Courses Table */}
               <div className="xl:col-span-2 flex flex-col">
@@ -607,11 +644,12 @@ const Dashboard = () => {
                         ? "No in-progress courses match your search."
                         : "Start Learning to get your progress tracked!"}
                     </p>
-                    <button                      className="mt-4 px-4 py-2 bg-teal-500 text-white text-sm font-medium rounded-lg hover:bg-teal-600"
+                    <button
+                      className="mt-4 px-4 py-2 bg-teal-500 text-white text-sm font-medium rounded-lg hover:bg-teal-600"
                       onClick={() => navigate("/courses")}
                     >
                       My Courses
-                    </button> 
+                    </button>
                   </div>
               )}
               </div>
